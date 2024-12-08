@@ -52,3 +52,7 @@ export type UserType = {
     clientSecret: string;
     totalCost: number;
   };
+
+  export type RoomType = {
+
+  };

@@ -211,6 +211,22 @@ export const fetchMyRooms = async (hotelId: string) => {
   const data = await response.json();
   return data;
 };
+
+export const getBookingsByUserId = async (userId: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/bookings/bookingof/${userId}`);
+    
+    if (!response.ok) {
+      throw new Error('Error fetching bookings');
+    }
+    
+    return await response.json();
+  } catch (error) {
+    console.error('Error fetching bookings by user ID:', error);
+    throw error;  // Throw error for handling in the component
+  }
+};
+
 export const getUserById = async (userId: string) => {
   const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
     credentials: "include", // Assuming you're handling cookies for authentication

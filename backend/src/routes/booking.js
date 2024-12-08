@@ -13,6 +13,28 @@ router.get('/', async (req, res) => {
     res.status(500).json({ message: 'Error fetching bookings', error: err });
   }
 });
+// Route để lấy bookings của người dùng
+router.get('/bookingof/:userId', (req, res) => {
+  const userId = req.params.userId;
+  
+  // Viết trực tiếp câu lệnh SQL để lấy bookings
+  const query = 'SELECT * FROM bookings WHERE user_id = ?';
+
+  connection.query(query, [userId], (err, results) => {
+    if (err) {
+      console.error('Error fetching bookings:', err);
+      return res.status(500).json({ message: 'Error fetching bookings', error: err });
+    }
+    
+    if (results.length > 0) {
+      // Nếu có kết quả, trả về danh sách bookings
+      res.json(results);
+    } else {
+      // Nếu không có bookings, trả về thông báo
+      res.status(404).json({ message: 'No bookings found for this user' });
+    }
+  });
+});
 // Route to get a single booking by ID
 router.get('/:id', async (req, res) => {
   const bookingId = req.params.id;
@@ -76,21 +98,7 @@ router.get('/:hotelId/:roomId', async (req, res) => {
   }
 });
 
-// Route to get bookings by user ID
-router.get('/user/:userId', async (req, res) => {
-  const userId = req.params.userId;
-  try {
-    const bookings = await Booking.getByUserId(userId);
-    if (bookings.length > 0) {
-      res.json(bookings);
-    } else {
-      res.status(404).json({ message: 'No bookings found for this user' });
-    }
-  } catch (err) {
-    console.error('Error fetching bookings for user:', err);
-    res.status(500).json({ message: 'Error fetching bookings for user', error: err });
-  }
-});
+
 
 // Endpoint để cập nhật trạng thái đặt phòng
 router.patch('/status/:id/:booking_status', (req, res) => {
