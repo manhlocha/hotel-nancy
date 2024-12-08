@@ -26,7 +26,7 @@ if (!fs.existsSync(uploadDir)) {
 // Enable CORS for the frontend URL (allowing credentials) before other routes
 app.use(cors({
     origin: 'http://localhost:5174',  // Frontend URL
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
     credentials: true,  // Enable cookies and credentials
 }));
 
@@ -45,6 +45,15 @@ const connection = mysql.createPool({
 
 // Test database connection
 app.get('/test-db', (req, res) => {
+    connection.query('SELECT 1 + 1 AS solution', (err, results) => {
+        if (err) {
+            return res.status(500).json({ message: 'Database connection error', error: err });
+        }
+        res.status(200).json({ message: 'Database connected successfully', solution: results[0].solution });
+    });
+});
+// Test database connection
+app.get('/test', (req, res) => {
     connection.query('SELECT 1 + 1 AS solution', (err, results) => {
         if (err) {
             return res.status(500).json({ message: 'Database connection error', error: err });

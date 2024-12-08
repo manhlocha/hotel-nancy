@@ -115,6 +115,12 @@ const MyHotels = () => {
             </div>
             <span className="flex justify-end space-x-4"> {/* space-x-4 tạo khoảng cách ngang giữa các phần tử */}
             <Link
+              to={`/${hotel.hotel_id}/manager-bookings`} // Assuming `hotel._id` is the correct property
+              className="flex bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500"
+            >
+              Xem danh sách đặt phòng
+            </Link>
+            <Link
               to={`/edit-hotel/${hotel.hotel_id}`} // Assuming `hotel._id` is the correct property
               className="flex bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500"
             >

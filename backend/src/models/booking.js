@@ -78,6 +78,30 @@ const Booking = {
     }
   },
 
+  // Get booking by hotelId, roomId
+  getByHotelRoomId: async (hotelId, roomId) => {
+    const query = 'SELECT * FROM bookings WHERE hotel_id = ? and room_id = ?';
+    try {
+      const [results] = await connection.execute(query, [hotelId, roomId]);
+      return results; // Return record
+    } catch (err) {
+      console.error('Error fetching booking by ID:', err);
+      throw err;
+    }
+  },
+  // Get booking by hotelId, roomId
+  getByHotelId: async (hotelId) => {
+    const query = 'SELECT * FROM bookings WHERE hotel_id = ?';
+    try {
+      const [results] = await connection.execute(query, [hotelId]);
+      return results; // Return record
+    } catch (err) {
+      console.error('Error fetching booking by ID:', err);
+      throw err;
+    }
+  },
+  
+  
   // Create a new booking
   create: async (bookingData) => {
     const query = `

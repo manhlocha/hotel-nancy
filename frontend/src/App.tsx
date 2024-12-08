@@ -28,6 +28,8 @@ import "slick-carousel/slick/slick-theme.css";
 import ViewHotels from "./pages/hotels/ViewHotel";
 import ViewRoom from "./pages/rooms/ViewRoom";
 import EditRoom from "./pages/rooms/EditRooms";
+import ManagerBookings from "./pages/rooms/ManagerBookings";
+import DetailBooking from "./pages/bookings/DetailBooking";
 
 const App = () => {
   const { isLoggedIn, userRole, userId } = useAppContext();
@@ -59,6 +61,9 @@ const App = () => {
                 <Route path="/room/:hotelId" element={<Layout><MyRoom /></Layout>} />
                 <Route path="/hotel/:hotelId/add-room" element={<Layout><AddRoom /></Layout>} />
                 <Route path="/edit-room/:roomId" element={<Layout><EditRoom /></Layout>} />
+                <Route path="/:hotelId/manager-bookings" element={<Layout><ManagerBookings /></Layout>} />
+                <Route path="/view-booking/:bookingId" element={<Layout><DetailBooking /></Layout>} />
+
                 </>
             )}
 

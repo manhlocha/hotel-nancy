@@ -20,7 +20,10 @@ type AppContext = {
   stripePromise: Promise<Stripe | null>;
   userId: string | null;
   userRole: string | null;
+  // hotelId: string | null;  // Added storeId to context
   setUserData: (id: string, userRole: string) => void; // Function to set user data in context
+  // setHotelId: (hotelId: string) => void; // Function to set storeId in context
+
 };
 
 const AppContext = React.createContext<AppContext | undefined>(undefined);
@@ -32,6 +35,7 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
   const [toast, setToast] = useState<ToastMessage | undefined>(undefined);
   const [userId, setUserId] = useState<string | null>(null);
   const [userRole, setUseruserRole] = useState<string | null>(null);
+  // const [hotelId, setHotelId] = useState<string | null>(null); // Added setter function for storeId
 
   // Query to validate the token and get user information
   const { isError, isLoading, data } = useQuery("validateToken", apiClient.validateToken, {
@@ -43,6 +47,19 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
       }
     },
   });
+  // // Query to fetch store based on userId but only if userRole is "1"
+  // const { data: hotelData } = useQuery(
+  //   "fetchMyHotels",
+  //   () => apiClient.fetchMyHotels(userId ?? ""),
+  //   {
+  //     enabled: !!userId && userRole === "1", // Only run if userId exists and userRole is "1"
+  //     onSuccess: (data) => {
+  //       if (data && data.length > 0) {
+  //         setHotelId(data[0]._id); // Set the first store's ID
+  //       }
+  //     },
+  //   }
+  // );
 
   // Determine if the user is logged in based on the error/loading state
   const isLoggedIn = !isError && !isLoading;
@@ -52,7 +69,8 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
     setUserId(id);
     setUseruserRole(userRole);
   };
-
+  // console.log(userId);
+  // console.log(hotelId);
   return (
     <AppContext.Provider
       value={{
@@ -63,6 +81,8 @@ export const AppContextProvider = ({ children }: { children: React.ReactNode }) 
         stripePromise, // Stripe promise for payment integration
         userId, // User ID from the context
         userRole, // User userRole from the context
+        // hotelId, // Current storeId
+        // setHotelId, // Function to set storeId
         setUserData, // Set user data function for updating the context
       }}
     >

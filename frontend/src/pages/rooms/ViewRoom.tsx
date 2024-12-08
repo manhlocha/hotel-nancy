@@ -6,19 +6,18 @@ import { BiMoney, BiBed, BiStar } from "react-icons/bi";
 import Slider from "react-slick";
 
 const ViewRoom = () => {
-  const { hotelId } = useParams(); // Lấy hotelId từ URL
+  const { hotelId } = useParams();
   if (!hotelId) {
     return <span>Hotel ID is missing or invalid.</span>;
   }
 
-  // Lấy dữ liệu phòng cho khách sạn với hotelId
   const { data: roomData, isLoading, isError } = useQuery(
     ['fetchMyRooms', hotelId],
-    () => apiClient.fetchMyRooms(hotelId), // Gọi apiClient.fetchMyRooms với hotelId
+    () => apiClient.fetchMyRooms(hotelId),
     {
       onError: (error) => {
         console.error('Error fetching rooms:', error);
-      }
+      },
     }
   );
 
@@ -44,7 +43,7 @@ const ViewRoom = () => {
       <div className="flex justify-between items-center">
         <h1 className="text-3xl font-bold">Các phòng trong khách sạn</h1>
         <Link
-          to={`/hotel/${hotelId}/add-room`} // Đường dẫn đến trang thêm phòng mới
+          to={`/hotel/${hotelId}/add-room`}
           className="bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500"
         >
           Thêm phòng
@@ -52,16 +51,28 @@ const ViewRoom = () => {
       </div>
       <div className="grid grid-cols-1 gap-8">
         {roomData.map((room: any) => {
-          // Kiểm tra và xử lý image_urls
-          let images = room.image_urls;
-          if (typeof images === 'string') {
+          let facilities = [];
+          if (typeof room.facilities === 'string') {
             try {
-              // Nếu image_urls là chuỗi JSON, parse nó thành mảng
-              images = JSON.parse(images);
+              facilities = JSON.parse(room.facilities);
             } catch (error) {
-              console.error("Error parsing image_urls:", error);
-              images = []; // Nếu không parse được, gán là mảng rỗng
+              console.error('Error parsing facilities:', error);
+              facilities = [room.facilities];
             }
+          } else if (Array.isArray(room.facilities)) {
+            facilities = room.facilities;
+          }
+
+          let images = [];
+          if (typeof room.image_urls === 'string') {
+            try {
+              images = JSON.parse(room.image_urls);
+            } catch (error) {
+              console.error('Error parsing image_urls:', error);
+              images = [];
+            }
+          } else if (Array.isArray(room.image_urls)) {
+            images = room.image_urls;
           }
 
           return (
@@ -70,11 +81,17 @@ const ViewRoom = () => {
               className="flex flex-col border border-slate-300 rounded-lg p-6 gap-6"
             >
               <h2 className="text-2xl font-semibold">{room.room_type}</h2>
-              <div className="text-sm text-gray-600">
-                {JSON.parse(room.facilities).join(", ")}
+              <div className="flex flex-wrap gap-2">
+                {facilities.map((facility: string, index: number) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 bg-blue-100 text-blue-600 text-sm font-medium rounded-full"
+                  >
+                    {facility}
+                  </span>
+                ))}
               </div>
               <div className="w-full h-48 bg-gray-200 rounded-lg overflow-hidden mb-4">
-                {/* Kiểm tra xem image_urls có phải là mảng hợp lệ hay không */}
                 {Array.isArray(images) && images.length > 0 ? (
                   <Slider {...sliderSettings}>
                     {images.map((image: string, index: number) => (
@@ -90,7 +107,7 @@ const ViewRoom = () => {
                 ) : (
                   <div>
                     <img
-                      src="/default-image.jpg" // Default image
+                      src="/default-image.jpg"
                       alt={room.room_type}
                       className="w-full h-full object-cover"
                     />
@@ -115,20 +132,19 @@ const ViewRoom = () => {
                   <span>Trạng thái: {room.availability_status === 1 ? "Available" : "Unavailable"}</span>
                 </div>
               </div>
-              <div className="flex justify-end">
-              <Link
-                to={`/rooms/${room.hotel_id}/${room.room_id}`} // Đường dẫn đến trang chỉnh sửa phòng
-                className="flex bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500"
-              >
-                Xem chi tiết phòng
-              </Link>
-
-              <Link
-                to={`/bookings/${room.hotel_id}/${room.room_id}`} // Đường dẫn đến trang chỉnh sửa phòng
-                className="flex bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500"
-              >
-                Đặt lịch ngay
-              </Link>
+              <div className="flex justify-end space-x-4">
+                <Link
+                  to={`/rooms/${room.hotel_id}/${room.room_id}`}
+                  className="bg-blue-600 text-white text-xl font-bold p-2 hover:bg-blue-500"
+                >
+                  Xem chi tiết phòng
+                </Link>
+                <Link
+                  to={`/bookings/${room.hotel_id}/${room.room_id}`}
+                  className="bg-green-600 text-white text-xl font-bold p-2 hover:bg-green-500"
+                >
+                  Đặt lịch ngay
+                </Link>
               </div>
             </div>
           );

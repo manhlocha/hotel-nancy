@@ -104,6 +104,52 @@ export const signOut = async () => {
   }
 };
 
+export const fetchUserById = async (userId : string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/user/${userId}`);
+    
+    // Kiểm tra xem HTTP request có thành công không
+    if (!response.ok) {
+      throw new Error('Failed to fetch user data');
+    }
+
+    // Trả về dữ liệu người dùng (ví dụ: { user_id, name, email })
+    const userData = await response.json();
+    return userData;
+  } catch (error) {
+    // Xử lý lỗi nếu có
+    console.error("Error fetching user data:", error);
+    throw error; // Quăng lỗi để React Query xử lý
+  }
+};
+export const getBookingbyId = async (bookingId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/bookings/${bookingId}`);
+  
+  if (!response.ok) {
+    throw new Error('Failed to fetch booking details');
+  }
+
+  return await response.json();
+};
+// Hàm cập nhật trạng thái đặt phòng
+export const updateBookingStatus = async (bookingId : string, newStatus:string) => {
+  const response = await fetch(`${API_BASE_URL}/api/bookings/status/${bookingId}/${newStatus}`, {
+    method: "PATCH",  // Phương thức PATCH để cập nhật dữ liệu
+    headers: {
+      "Content-Type": "application/json",  // Chỉ ra rằng dữ liệu gửi đi là JSON
+    },
+    body: JSON.stringify({
+      booking_status: newStatus,  // Gửi trạng thái mới của đặt phòng
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error("Failed to update booking status");  // Nếu không thành công, ném lỗi
+  }
+
+  return response.json();  // Trả về dữ liệu JSON từ phản hồi của server
+};
+
 export const addMyHotel = async (formData: FormData) => {
   try {
     // Gửi formData lên API
@@ -165,6 +211,20 @@ export const fetchMyRooms = async (hotelId: string) => {
   const data = await response.json();
   return data;
 };
+export const getUserById = async (userId: string) => {
+  const response = await fetch(`${API_BASE_URL}/api/users/${userId}`, {
+    credentials: "include", // Assuming you're handling cookies for authentication
+  });
+
+  if (!response.ok) {
+    const errorMessage = await response.text();
+    throw new Error(`Error fetching user: ${errorMessage}`);
+  }
+
+  const data = await response.json();
+  return data;
+};
+
 export const fetchRoom = async (hotelId: string, roomId: string) => {
   try {
     const response = await fetch(`${API_BASE_URL}/api/room/${hotelId}/${roomId}`);
@@ -378,6 +438,54 @@ export const createRoomBooking = async (formData: BookingFormData) => {
   }
 };
 
+export const createBooking = async (bookingData: object) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/bookings`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      credentials: "include",
+      body: JSON.stringify(bookingData),
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Error booking room");
+  }
+  return response.json();
+};
+
+export const getBookingByHotelAndRoomId = async (hotelId :string, roomId :string) => {
+  const response = await fetch(
+    `${API_BASE_URL}/api/bookings/${hotelId}/${roomId}`,
+    {
+      credentials: "include",
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Error booking room");
+  }
+  return response.json();
+};
+
+export const fetchManagerBookings = async (hotelId: string) => {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/bookings/hotel/${hotelId}`);
+    
+    if (!response.ok) {
+      throw new Error('Failed to fetch bookings');
+    }
+
+    const data = await response.json();
+    return data; // Assuming the response is a list of bookings
+  } catch (error) {
+    console.error('Error fetching bookings:', error);
+    throw error; // Rethrow error to be handled by useQuery in the component
+  }
+};
 // export const fetchMyBookings = async (): Promise<HotelType[]> => {
 //   const response = await fetch(`${API_BASE_URL}/api/my-bookings`, {
 //     credentials: "include",
